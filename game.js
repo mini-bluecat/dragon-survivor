@@ -11,7 +11,7 @@ const ARENA = { w: 720, h: 480 };  // play field in CSS pixels
 const PLAYER_BASE = {
   maxHp: 5, fireRate: 2.5, moveSpeed: 180, projectiles: 1, radius: 16,
   magnet: 18, slow: 0, orbit: 0, damage: 10, starBonus: 0, regen: 0, nova: 0,
-  shieldCd: 0, shieldReady: false, shieldTimer: 0,
+  shield: 0, shieldMax: 0,
 };
 
 const GEM_XP = 1;                  // base XP each star gives
@@ -53,8 +53,8 @@ const POWERS = {
               flavor: 'Stars, hearts & coins fly to you from farther.',
               apply: (s) => { s.player.magnet += 46; } },
   armor:    { id: 'armor',    name: 'Dragon Armor',   emoji: '🛡️', world: 0, maxLevel: 3,
-              flavor: 'A shield blocks a hit. Recharges faster each level.',
-              apply: (s) => { const cds = [14, 11, 8]; s.player.shieldCd = cds[(s.powers.armor || 1) - 1]; s.player.shieldReady = true; s.player.shieldTimer = 0; } },
+              flavor: 'A shield that blocks hits. Stronger each level.',
+              apply: (s) => { const maxes = [3, 4, 5]; s.player.shieldMax = maxes[(s.powers.armor || 1) - 1]; s.player.shield = s.player.shieldMax; } },
   might:    { id: 'might',    name: 'Mighty Fire',    emoji: '💥', world: 0, maxLevel: 3,
               flavor: 'Fire hits harder each level.',
               apply: (s) => { s.player.damage += 4; } },
@@ -87,7 +87,7 @@ const POWERS = {
               apply: (s) => { s.player.moveSpeed += 30; s.player.fireRate += 0.35; } },
   bubble:   { id: 'bubble',   name: 'Bubble Shield',  emoji: '🫧', world: 5, maxLevel: 3,
               flavor: 'A shield + slow healing.',
-              apply: (s) => { s.player.regen += 1; if (s.player.shieldCd === 0) { s.player.shieldCd = 7; s.player.shieldReady = true; } } },
+              apply: (s) => { s.player.regen += 1; if (s.player.shieldMax === 0) { s.player.shieldMax = 3; s.player.shield = 3; } } },
   vine:     { id: 'vine',     name: 'Vine Grab',      emoji: '🌿', world: 6, maxLevel: 3,
               flavor: 'Slow the swarm + heal a little.',
               apply: (s) => { s.player.slow += 0.1; s.player.regen += 1; } },
@@ -116,8 +116,8 @@ const FUSIONS = {
                apply: (s) => { s.player.projectiles += 2; s.player.orbit += 2; } },
   iceshield: { id: 'iceshield', name: 'Ice Shield Dragon', emoji: '🧊',
                requires: ['armor', 'frost'],
-               flavor: 'SUPER! Fast shield + the swarm nearly freezes.',
-               apply: (s) => { s.player.slow += 0.3; s.player.shieldCd = 3; s.player.shieldReady = true; } },
+               flavor: 'SUPER! Big shield + the swarm nearly freezes.',
+               apply: (s) => { s.player.slow += 0.3; s.player.shieldMax = 6; s.player.shield = 6; } },
   goldrush:  { id: 'goldrush',  name: 'Gold Rush Dragon',  emoji: '💰',
                requires: ['magnet', 'wings'],
                flavor: 'SUPER! Zoom fast and suck in every coin.',
@@ -369,18 +369,23 @@ function offerUpgrades(state, rng) {
 }
 function chooseUpgrade(state, choice) {
   if (!choice) return false;
+  let ok = false;
   if (choice.kind === 'power') {
     const pw = POWERS[choice.id];
     if (!pw) return false;
     state.powers[choice.id] = (state.powers[choice.id] || 0) + 1;
     pw.apply(state);
-    return true;
-  }
-  if (choice.kind === 'fusion') {
+    ok = true;
+  } else if (choice.kind === 'fusion') {
     const fu = FUSIONS[choice.id];
     if (!fu || state.fusions.includes(choice.id)) return false;
     state.fusions.push(choice.id);
     fu.apply(state);
+    ok = true;
+  }
+  if (ok) {
+    // leveling up gives you a fresh shield
+    if (state.player.shieldMax > 0) state.player.shield = state.player.shieldMax;
     return true;
   }
   return false;
@@ -399,9 +404,8 @@ function freshGame(perks, skinEmoji, badgeBonus) {
     magnet: PLAYER_BASE.magnet + lv('magnet') * 20,
     projectiles: PLAYER_BASE.projectiles + lv('shot'),
     starBonus: PLAYER_BASE.starBonus + lv('star'),
-    shieldCd: shieldLv > 0 ? [12, 9, 6][Math.min(shieldLv, 3) - 1] : 0,
-    shieldReady: shieldLv > 0,
-    shieldTimer: 0,
+    shieldMax: shieldLv > 0 ? [3, 4, 5][Math.min(shieldLv, 3) - 1] : 0,
+    shield: shieldLv > 0 ? [3, 4, 5][Math.min(shieldLv, 3) - 1] : 0,
     emoji: skinEmoji || '🐉',
     pop: 0, invuln: 0, aim: 0,
     hp: PLAYER_BASE.maxHp,
@@ -554,9 +558,8 @@ function spawnBurst(state, x, y, id) {
 function hurtHero(state) {
   const p = state.player;
   if (p.invuln > 0) return;
-  if (p.shieldReady) {
-    p.shieldReady = false;
-    p.shieldTimer = 0;
+  if (p.shield > 0) {
+    p.shield -= 1;
     p.invuln = 0.5;
     spawnFloater(state, p.x, p.y - 24, '🛡️', 'shield');
     state._block = true;
@@ -594,11 +597,7 @@ function update(state, dt, input) {
   if (state.shake > 0) state.shake = Math.max(0, state.shake - dt);
   if (state.novaFx > 0) state.novaFx = Math.max(0, state.novaFx - dt * 2);
 
-  // shield recharge
-  if (p.shieldCd > 0 && !p.shieldReady) {
-    p.shieldTimer += dt;
-    if (p.shieldTimer >= p.shieldCd) { p.shieldReady = true; p.shieldTimer = 0; }
-  }
+  // (shield is charge-based now — it refills when you level up)
 
   for (const f of state.floaters) { f.age += dt; f.y -= 22 * dt; }
   state.floaters = state.floaters.filter((f) => f.age < f.life);
@@ -980,13 +979,17 @@ function render(ctx, state) {
 
   drawHero(ctx, state.player);
 
-  // shield bubble
-  if (state.player.shieldReady) {
+  // shield bubble (shows remaining charges)
+  if (state.player.shield > 0) {
     ctx.strokeStyle = cssVar('--accent', '#a855f7');
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(state.player.x, state.player.y, state.player.radius + 7, 0, Math.PI * 2);
     ctx.stroke();
+    ctx.fillStyle = cssVar('--accent', '#a855f7');
+    ctx.font = 'bold 11px system-ui, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(state.player.shield), state.player.x, state.player.y - state.player.radius - 13);
   }
 
   // nova ring (screen-clearing pulse)
