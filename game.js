@@ -16,7 +16,7 @@ const PLAYER_BASE = {
 
 const GEM_XP = 1;                  // base XP each star gives
 const TOUCH_DAMAGE = 1;            // hearts lost when a monster touches you
-const HIT_COOLDOWN = 0.6;          // seconds of i-frames after a touch (longer = easier)
+const HIT_COOLDOWN = 0.5;          // seconds of i-frames after a touch
 const HEART_CHANCE = 0.04;         // base 4 in 100 monsters drop a heart
 
 const PROJECTILE_SPEED = 380;      // px/sec
@@ -32,9 +32,9 @@ const NOVA_EVERY = 6;              // seconds between screen-clearing pulses
 const SHAKE_ON_HIT = 0.25;         // seconds of screen shake on a player hit
 const POP_TIME = 0.18;             // hero squash/stretch duration
 
-const SPAWN_BASE = 1.0;            // seconds between spawns at t=0
-const SPAWN_MIN = 0.25;            // fastest the swarm can spawn
-const SPAWN_RAMP = 0.018;          // spawn interval shed per second survived
+const SPAWN_BASE = 0.85;           // seconds between spawns at t=0
+const SPAWN_MIN = 0.2;             // fastest the swarm can spawn
+const SPAWN_RAMP = 0.022;          // spawn interval shed per second survived
 
 const BOSS_STEP = 5;               // a boss appears every 5 levels
 const GOLD_EVERY = 40;             // a gold-coin pile drops every 40 kills
@@ -483,10 +483,10 @@ function spawnEnemy(state, rng) {
   else if (edge === 1) { x = ARENA.w + 20; y = r() * ARENA.h; }
   else if (edge === 2) { x = r() * ARENA.w; y = ARENA.h + 20; }
   else { x = -20; y = r() * ARENA.h; }
-  const hp = Math.round(def.hp * hpMul);
+  const hp = Math.round(def.hp * hpMul * 1.1);
   state.enemies.push({
     id: def.id, emoji: def.emoji, behavior: def.behavior,
-    x, y, hp, maxHp: hp, speed: def.speed * spdMul,
+    x, y, hp, maxHp: hp, speed: def.speed * spdMul * 1.15,
     xp: GEM_XP, radius: 16, age: 0, orbitHit: 0,
   });
 }
