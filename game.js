@@ -135,6 +135,8 @@ const SHOP = {
   breath: { id: 'breath', name: 'Quick Breath', emoji: '⚡', desc: '+0.3 fire speed',            cost: [35, 70, 115, 170, 240], max: 5 },
   luck:   { id: 'luck',   name: 'Lucky Hearts', emoji: '🍀', desc: '+4% heart drop chance',      cost: [45, 100, 180], max: 3 },
   gold:   { id: 'gold',   name: 'Gold Finder',  emoji: '💰', desc: '+20% more gold from drops',  cost: [50, 110, 200], max: 3 },
+  magnet: { id: 'magnet', name: 'Magnet Boost', emoji: '🧲', desc: '+20 pickup range',            cost: [30, 60, 100, 150, 220], max: 5 },
+  shield: { id: 'shield', name: 'Starting Shield', emoji: '🛡️', desc: 'Start each run with a shield', cost: [60, 130, 220], max: 3 },
 };
 
 // Badges — earn them by playing, then tap one to wear it. Shows in the HUD.
@@ -148,6 +150,16 @@ const BADGES = [
   { id: 'cosmic',        emoji: '🌌', name: 'Cosmic Dragon', hint: 'Reach level 30' },
   { id: 'immortal',      emoji: '👑', name: 'Immortal',      hint: 'Reach level 40' },
 ];
+
+// Skins — change your dragon's look. Buy one with gold, then wear it.
+const SKINS = {
+  dragon:     { id: 'dragon',     emoji: '🐉', name: 'Classic Dragon', cost: 0 },
+  trex:       { id: 'trex',       emoji: '🦖', name: 'T-Rex',          cost: 100 },
+  dragonface: { id: 'dragonface', emoji: '🐲', name: 'Dragon Face',    cost: 150 },
+  lizard:     { id: 'lizard',     emoji: '🦎', name: 'Lizard',         cost: 120 },
+  frog:       { id: 'frog',       emoji: '🐸', name: 'Frog',           cost: 100 },
+  unicorn:    { id: 'unicorn',    emoji: '🦄', name: 'Unicorn',        cost: 200 },
+};
 
 // Enemies. behavior ∈ chase | zigzag. Two per world; later worlds are tougher.
 const ENEMIES = {
@@ -357,14 +369,20 @@ function chooseUpgrade(state, choice) {
 }
 
 // ===== State factory (ONE game-state object) =====
-function freshGame(perks) {
+function freshGame(perks, skinEmoji) {
   const pk = perks || {};
   const lv = (id) => pk[id] || 0;
+  const shieldLv = lv('shield');
   const player = Object.assign({}, PLAYER_BASE, {
     x: ARENA.w / 2, y: ARENA.h / 2,
     damage: PLAYER_BASE.damage + lv('claw') * 2,
     moveSpeed: PLAYER_BASE.moveSpeed + lv('speed') * 15,
     fireRate: PLAYER_BASE.fireRate + lv('breath') * 0.3,
+    magnet: PLAYER_BASE.magnet + lv('magnet') * 20,
+    shieldCd: shieldLv > 0 ? [8, 6, 4][Math.min(shieldLv, 3) - 1] : 0,
+    shieldReady: shieldLv > 0,
+    shieldTimer: 0,
+    emoji: skinEmoji || '🐉',
     hp: PLAYER_BASE.maxHp,
   });
   return {
@@ -383,7 +401,7 @@ function freshGame(perks) {
 
 // ===== Persistence (best time + the save file: gold, upgrades, badges, map) =====
 function defaultSave() {
-  return { gold: 0, ups: {}, badge: 'hatchling', badges: ['hatchling'], bestWorld: 1 };
+  return { gold: 0, ups: {}, badge: 'hatchling', badges: ['hatchling'], bestWorld: 1, skin: 'dragon', skins: ['dragon'] };
 }
 function loadSave() {
   if (typeof localStorage === 'undefined') return defaultSave();
@@ -393,6 +411,8 @@ function loadSave() {
     const d = JSON.parse(raw);
     const s = Object.assign(defaultSave(), d);
     if (!Array.isArray(s.badges)) s.badges = ['hatchling'];
+    if (!Array.isArray(s.skins) || s.skins.length === 0) s.skins = ['dragon'];
+    if (!SKINS[s.skin]) s.skin = 'dragon';
     return s;
   } catch (e) { return defaultSave(); }
 }
@@ -871,7 +891,7 @@ function drawHero(ctx, p) {
   if (p.invuln > 0 && Math.floor(p.invuln * 20) % 2 === 0) ctx.globalAlpha = 0.45;
   ctx.font = '34px system-ui, sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('🐉', 0, 0);
+  ctx.fillText(p.emoji || '🐉', 0, 0);
   ctx.restore();
 }
 function render(ctx, state) {
@@ -1063,6 +1083,41 @@ function renderShop() {
     row.appendChild(btn);
     list.appendChild(row);
   }
+
+  // skins (buy + equip a look)
+  const heading = document.createElement('div');
+  heading.className = 'shop-heading';
+  heading.textContent = 'Dragon Skins';
+  list.appendChild(heading);
+  for (const id in SKINS) {
+    const sk = SKINS[id];
+    const owned = save.skins.includes(id);
+    const equipped = save.skin === id;
+    const row = document.createElement('div');
+    row.className = 'shop-row';
+    const info = document.createElement('div');
+    info.className = 'shop-info';
+    info.innerHTML =
+      '<span class="shop-emoji">' + sk.emoji + '</span>' +
+      '<span class="shop-name">' + sk.name + '</span>' +
+      '<span class="shop-desc">' + (owned ? 'Owned' : '🪙 ' + sk.cost) + '</span>';
+    row.appendChild(info);
+    const btn = document.createElement('button');
+    btn.className = 'buy-btn';
+    if (equipped) { btn.textContent = '✓ ON'; btn.disabled = true; }
+    else if (owned) {
+      btn.textContent = 'EQUIP';
+      btn.addEventListener('click', () => { save.skin = id; saveSave(save); renderShop(); sfx('buy'); });
+    } else {
+      btn.textContent = '🪙 ' + sk.cost;
+      btn.disabled = save.gold < sk.cost;
+      btn.addEventListener('click', () => {
+        if (save.gold >= sk.cost) { save.gold -= sk.cost; save.skins.push(id); save.skin = id; saveSave(save); renderShop(); sfx('buy'); }
+      });
+    }
+    row.appendChild(btn);
+    list.appendChild(row);
+  }
 }
 
 function renderMap() {
@@ -1243,14 +1298,14 @@ function init() {
   const ctx = canvas.getContext('2d');
 
   save = loadSave();
-  state = freshGame(save.ups);
+  state = freshGame(save.ups, (SKINS[save.skin] || SKINS.dragon).emoji);
   muted = loadMute();
   setMute(muted);
 
   const handlers = {
     onChoose: resumeFromLevelUp,
     onStart: startRun,
-    onRestart: () => { state = freshGame(save.ups); startRun(); },
+    onRestart: () => { state = freshGame(save.ups, (SKINS[save.skin] || SKINS.dragon).emoji); startRun(); },
   };
 
   window.addEventListener('keydown', (e) => {
@@ -1309,7 +1364,7 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     ARENA, PLAYER_BASE, GEM_XP, TOUCH_DAMAGE, HEART_CHANCE, PROJECTILE_SPEED, GOLD_EVERY, NOVA_EVERY,
-    POWERS, FUSIONS, SHOP, BADGES, ENEMIES, BOSSES, WORLDS, BURSTS,
+    POWERS, FUSIONS, SHOP, SKINS, BADGES, ENEMIES, BOSSES, WORLDS, BURSTS,
     clamp, dist2, circleHit, nearestEnemy,
     xpForLevel, applyXp, spawnInterval, roundScale, formatTime, betterBest,
     steer, spawnProjectiles, availablePowerIds, offerUpgrades, chooseUpgrade,

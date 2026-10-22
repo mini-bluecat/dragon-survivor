@@ -90,6 +90,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
 
 /* ===== Shop ===== */
 .shop{ display:flex; flex-direction:column; gap:8px; width:100%; max-width:420px }
+.shop-heading{ margin-top:6px; font-size:14px; font-weight:800; color:var(--accent); text-align:left }
 .shop-row{ display:flex; align-items:center; justify-content:space-between; gap:10px;
   background:var(--panel); border:2px solid #e4dbf8; border-radius:14px; padding:10px 12px; text-align:left }
 .shop-info{ display:flex; flex-direction:column; gap:2px }
