@@ -482,7 +482,7 @@ function spawnEnemy(state, rng) {
   const hp = Math.round(def.hp * hpMul * 1.3);
   state.enemies.push({
     id: def.id, emoji: def.emoji, behavior: def.behavior,
-    x, y, hp, maxHp: hp, speed: def.speed * spdMul * 1.3,
+    x, y, hp, maxHp: hp, speed: def.speed * spdMul,
     xp: GEM_XP, radius: 16, age: 0, orbitHit: 0,
   });
 }
