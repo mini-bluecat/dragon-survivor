@@ -16,7 +16,7 @@ const PLAYER_BASE = {
 
 const GEM_XP = 1;                  // base XP each star gives
 const TOUCH_DAMAGE = 1;            // hearts lost when a monster touches you
-const HIT_COOLDOWN = 0.45;         // seconds of i-frames after a touch (shorter = harder)
+const HIT_COOLDOWN = 0.35;         // seconds of i-frames after a touch (shorter = harder)
 const HEART_CHANCE = 0.03;         // base 3 in 100 monsters drop a heart
 
 const PROJECTILE_SPEED = 380;      // px/sec
@@ -32,9 +32,9 @@ const NOVA_EVERY = 6;              // seconds between screen-clearing pulses
 const SHAKE_ON_HIT = 0.25;         // seconds of screen shake on a player hit
 const POP_TIME = 0.18;             // hero squash/stretch duration
 
-const SPAWN_BASE = 0.9;            // seconds between spawns at t=0
-const SPAWN_MIN = 0.16;            // fastest the swarm can spawn
-const SPAWN_RAMP = 0.022;          // spawn interval shed per second survived
+const SPAWN_BASE = 0.7;            // seconds between spawns at t=0
+const SPAWN_MIN = 0.12;            // fastest the swarm can spawn
+const SPAWN_RAMP = 0.028;          // spawn interval shed per second survived
 
 const BOSS_STEP = 5;               // a boss appears every 5 levels
 const GOLD_EVERY = 40;             // a gold-coin pile drops every 40 kills
@@ -144,13 +144,13 @@ const SHOP = {
 // Badges — earn them by playing, then tap one to wear it. Shows in the HUD.
 const BADGES = [
   { id: 'hatchling',     emoji: '🐣', name: 'Hatchling',      hint: 'Play your first run',  effect: 'Starter badge — no bonus',      bonus: {} },
-  { id: 'firestarter',   emoji: '🔥', name: 'Fire Starter',   hint: 'Reach level 5',        effect: '+2 damage',                     bonus: { damage: 2 } },
-  { id: 'dragonmaster',  emoji: '🐉', name: 'Dragon Master',  hint: 'Reach level 10',       effect: '+0.4 fire speed',               bonus: { fireRate: 0.4 } },
-  { id: 'bosslayer',     emoji: '👑', name: 'Boss Slayer',    hint: 'Beat a boss',          effect: '+20 move speed',                bonus: { moveSpeed: 20 } },
-  { id: 'worldtraveler', emoji: '🌍', name: 'World Traveler', hint: 'Reach world 3',        effect: '+30 pickup range',              bonus: { magnet: 30 } },
-  { id: 'legend',        emoji: '🏆', name: 'Legend',         hint: 'Reach level 20',       effect: '+4 damage',                     bonus: { damage: 4 } },
-  { id: 'cosmic',        emoji: '🌌', name: 'Cosmic Dragon',  hint: 'Reach level 30',       effect: '+1 fireball',                   bonus: { projectiles: 1 } },
-  { id: 'immortal',      emoji: '💎', name: 'Immortal',       hint: 'Reach level 40',       effect: '+3 damage & +0.3 fire speed',   bonus: { damage: 3, fireRate: 0.3 } },
+  { id: 'firestarter',   emoji: '🔥', name: 'Fire Starter',   hint: 'Reach level 8',        effect: '+2 damage',                     bonus: { damage: 2 } },
+  { id: 'dragonmaster',  emoji: '🐉', name: 'Dragon Master',  hint: 'Reach level 16',       effect: '+0.4 fire speed',               bonus: { fireRate: 0.4 } },
+  { id: 'bosslayer',     emoji: '👑', name: 'Boss Slayer',    hint: 'Beat 2 bosses',        effect: '+20 move speed',                bonus: { moveSpeed: 20 } },
+  { id: 'worldtraveler', emoji: '🌍', name: 'World Traveler', hint: 'Reach world 5',        effect: '+30 pickup range',              bonus: { magnet: 30 } },
+  { id: 'legend',        emoji: '🏆', name: 'Legend',         hint: 'Reach level 28',       effect: '+4 damage',                     bonus: { damage: 4 } },
+  { id: 'cosmic',        emoji: '🌌', name: 'Cosmic Dragon',  hint: 'Reach level 40',       effect: '+1 fireball',                   bonus: { projectiles: 1 } },
+  { id: 'immortal',      emoji: '💎', name: 'Immortal',       hint: 'Reach level 55',       effect: '+3 damage & +0.3 fire speed',   bonus: { damage: 3, fireRate: 0.3 } },
 ];
 
 // Skins — change your dragon's look. Buy one with gold, then wear it.
@@ -189,6 +189,14 @@ const ENEMIES = {
   unicorn:   { id: 'unicorn',   emoji: '🦄', hp: 32, speed: 126, behavior: 'zigzag' },
   moonrock:  { id: 'moonrock',  emoji: '🌙', hp: 110, speed: 72, behavior: 'chase' },
   shooting:  { id: 'shooting',  emoji: '🌠', hp: 34, speed: 132, behavior: 'zigzag' },
+  robot:     { id: 'robot',     emoji: '🤖', hp: 120, speed: 74, behavior: 'chase' },
+  bolt:      { id: 'bolt',      emoji: '🔩', hp: 36, speed: 134, behavior: 'zigzag' },
+  butterfly: { id: 'butterfly', emoji: '🦋', hp: 130, speed: 76, behavior: 'chase' },
+  bee:       { id: 'bee',       emoji: '🐝', hp: 38, speed: 136, behavior: 'zigzag' },
+  mushroom:  { id: 'mushroom',  emoji: '🍄', hp: 140, speed: 78, behavior: 'chase' },
+  snail:     { id: 'snail',     emoji: '🐌', hp: 40, speed: 120, behavior: 'zigzag' },
+  gem:       { id: 'gem',       emoji: '💎', hp: 150, speed: 80, behavior: 'chase' },
+  sparkle:   { id: 'sparkle',   emoji: '✨', hp: 42, speed: 138, behavior: 'zigzag' },
 };
 
 // Bosses — one per world, big and slow, appear every 5 levels.
@@ -205,6 +213,10 @@ const BOSSES = {
   scorpionking: { id: 'scorpionking', name: 'Scorpion King', emoji: '🦂', hp: 1800, speed: 46, radius: 34 },
   rainbowqueen: { id: 'rainbowqueen', name: 'Rainbow Queen', emoji: '🌈', hp: 1950, speed: 48, radius: 34 },
   moonking:     { id: 'moonking',     name: 'Moon King',     emoji: '🌙', hp: 2100, speed: 48, radius: 34 },
+  robotking:    { id: 'robotking',    name: 'Robot King',    emoji: '🤖', hp: 2250, speed: 50, radius: 34 },
+  butterflyqueen: { id: 'butterflyqueen', name: 'Butterfly Queen', emoji: '🦋', hp: 2400, speed: 50, radius: 34 },
+  mushroomking: { id: 'mushroomking', name: 'Mushroom King', emoji: '🍄', hp: 2550, speed: 52, radius: 34 },
+  gemking:      { id: 'gemking',      name: 'Gem King',      emoji: '💎', hp: 2700, speed: 52, radius: 34 },
 };
 
 // Worlds — the adventure. `arena`/`grid` are the floor colours; `enemies` picks the
@@ -222,6 +234,10 @@ const WORLDS = [
   { id: 'desert',   name: 'Desert World',   emoji: '🏜️', arena: '#fff3e0', grid: '#ffe2bf', enemies: ['scorpion', 'cactus'],    boss: 'scorpionking' },
   { id: 'rainbow',  name: 'Rainbow World',  emoji: '🌈', arena: '#ffeefc', grid: '#ffd6f2', enemies: ['rainbow', 'unicorn'],    boss: 'rainbowqueen' },
   { id: 'moon',     name: 'Moon World',     emoji: '🌙', arena: '#e9ecff', grid: '#d6dcff', enemies: ['moonrock', 'shooting'],  boss: 'moonking' },
+  { id: 'robot',    name: 'Robot World',    emoji: '⚙️', arena: '#f0f2f6', grid: '#dde2ea', enemies: ['robot', 'bolt'],        boss: 'robotking' },
+  { id: 'butterfly', name: 'Butterfly World', emoji: '🦋', arena: '#fff0f8', grid: '#ffd6ec', enemies: ['butterfly', 'bee'],  boss: 'butterflyqueen' },
+  { id: 'mushroom', name: 'Mushroom World', emoji: '🍄', arena: '#f6f2ec', grid: '#e8dcc8', enemies: ['mushroom', 'snail'],   boss: 'mushroomking' },
+  { id: 'gem',      name: 'Gem World',      emoji: '💎', arena: '#f0ecff', grid: '#ddd2ff', enemies: ['gem', 'sparkle'],      boss: 'gemking' },
 ];
 
 // Particle bursts per content id, with a graceful fallback.
@@ -396,7 +412,7 @@ function freshGame(perks, skinEmoji, badgeBonus) {
   if (bb.magnet) player.magnet += bb.magnet;
   if (bb.projectiles) player.projectiles += bb.projectiles;
   return {
-    status: 'start', time: 0,
+    status: 'start', time: 0, quit: false,
     level: 1, xp: 0, xpToNext: xpForLevel(1),
     worldIndex: 0, boss: null, nextBossAt: BOSS_STEP,
     player,
@@ -462,7 +478,7 @@ function spawnEnemy(state, rng) {
   else if (edge === 1) { x = ARENA.w + 20; y = r() * ARENA.h; }
   else if (edge === 2) { x = r() * ARENA.w; y = ARENA.h + 20; }
   else { x = -20; y = r() * ARENA.h; }
-  const hp = Math.round(def.hp * hpMul);
+  const hp = Math.round(def.hp * hpMul * 1.4);
   state.enemies.push({
     id: def.id, emoji: def.emoji, behavior: def.behavior,
     x, y, hp, maxHp: hp, speed: def.speed * spdMul * 1.25,
@@ -493,7 +509,7 @@ function spawnBoss(state) {
   const world = currentWorld(state);
   const def = BOSSES[world.boss];
   const rs = roundScale(state);
-  const hp = Math.round(def.hp * (1 + rs * 0.22));
+  const hp = Math.round(def.hp * (1 + rs * 0.30));
   state.boss = {
     id: def.id, name: def.name, emoji: def.emoji,
     x: ARENA.w / 2, y: -40, hp, maxHp: hp,
@@ -518,6 +534,7 @@ function killBoss(state) {
   state.boss = null;
   spawnFloater(state, b.x, b.y, 'New world! ' + currentWorld(state).emoji, 'world');
   state._worldup = true;
+  state._bossdie = true;
 }
 function spawnFloater(state, x, y, text, kind) {
   state.floaters.push({ x, y, text, kind: kind || 'dmg', age: 0, life: 0.9 });
@@ -626,7 +643,7 @@ function update(state, dt, input) {
   // --- spawn director (current world's pool; more monsters per tick each round) ---
   state.spawnTimer -= dt;
   if (state.spawnTimer <= 0 || state.enemies.length === 0) {
-    const count = Math.min(4, 1 + Math.floor(roundScale(state) / 3));
+    const count = Math.min(5, 1 + Math.floor(roundScale(state) / 2));
     for (let i = 0; i < count; i++) spawnEnemy(state);
     state.spawnTimer = spawnInterval(state.time);
   }
@@ -860,6 +877,8 @@ const SFX = {
   block:   (c, t) => { tone(c, 220, t, 0.08, 'sine', 0.09); },
   nova:    (c, t) => { tone(c, 90, t, 0.3, 'sawtooth', 0.1); tone(c, 180, t + 0.05, 0.25, 'triangle', 0.1); },
   boss:    (c, t) => { tone(c, 110, t, 0.4, 'sawtooth', 0.12); tone(c, 82, t + 0.1, 0.4, 'sawtooth', 0.1); },
+  rare:    (c, t) => { [660, 880, 1320].forEach((f, i) => tone(c, f, t + i * 0.06, 0.1, 'triangle', 0.12)); },
+  bossdie: (c, t) => { tone(c, 90, t, 0.4, 'sawtooth', 0.14); tone(c, 60, t + 0.1, 0.5, 'sawtooth', 0.12); tone(c, 220, t + 0.15, 0.3, 'square', 0.1); },
   worldup: (c, t) => { [392, 494, 587, 784].forEach((f, i) => tone(c, f, t + i * 0.08, 0.2, 'triangle', 0.13)); },
   levelup: (c, t) => { [523, 659, 784, 1047].forEach((f, i) => tone(c, f, t + i * 0.07, 0.18, 'triangle', 0.13)); },
   buy:     (c, t) => { tone(c, 660, t, 0.08, 'triangle', 0.12); tone(c, 880, t + 0.08, 0.12, 'triangle', 0.12); },
@@ -884,6 +903,7 @@ function consumeAudioEvents(state) {
   if (state._boss)    { sfx('boss');    state._boss = false; }
   if (state._worldup) { sfx('worldup'); state._worldup = false; }
   if (state._levelup) { sfx('levelup'); state._levelup = false; }
+  if (state._bossdie) { sfx('bossdie'); state._bossdie = false; }
   if (state._over)    { sfx('over');    state._over = false; }
 }
 
@@ -1146,9 +1166,9 @@ function renderMap() {
     cell.className = 'map-cell' + (reached ? '' : ' locked');
     cell.innerHTML =
       '<span class="map-num">' + num + '</span>' +
-      '<span class="map-emoji">' + (reached ? w.emoji : '🔒') + '</span>' +
-      '<span class="map-name">' + (reached ? w.name : '???') + '</span>' +
-      '<span class="map-boss">' + (reached ? '👑 ' + BOSSES[w.boss].name : 'Beat the last boss!') + '</span>';
+      '<span class="map-emoji">' + w.emoji + '</span>' +
+      '<span class="map-name">' + w.name + '</span>' +
+      '<span class="map-boss">' + (reached ? '👑 ' + BOSSES[w.boss].name : '🔒 Locked') + '</span>';
     grid.appendChild(cell);
   });
 }
@@ -1160,19 +1180,23 @@ function showOverlays(state, handlers) {
   const over = document.getElementById('gameover');
   const shop = document.getElementById('shop');
   const map = document.getElementById('map');
+  const pause = document.getElementById('pause');
+  const badges = document.getElementById('badges-page');
   const quit = document.getElementById('quit');
   if (!start || !levelup || !over) return;
   if (shop) shop.hidden = true;
   if (map) map.hidden = true;
-  if (quit) quit.hidden = (state.status === 'start' || state.status === 'over');
+  if (pause) pause.hidden = true;
+  if (badges) badges.hidden = true;
+  if (quit) quit.hidden = (state.status !== 'playing');
   start.hidden = state.status !== 'start';
   levelup.hidden = state.status !== 'levelup';
   over.hidden = state.status !== 'over';
+  if (pause) pause.hidden = state.status !== 'pause';
 
   if (state.status === 'start') {
     const g = document.getElementById('start-gold');
     if (g) g.textContent = String(save.gold);
-    renderBadges();
   }
   if (state.status === 'levelup') {
     const row = document.getElementById('cards');
@@ -1203,6 +1227,8 @@ function showOverlays(state, handlers) {
     }
   }
   if (state.status === 'over') {
+    const heading = document.getElementById('over-heading');
+    if (heading) heading.textContent = state.quit ? 'You quit!' : 'Out of hearts!';
     const t = document.getElementById('over-time');
     const b = document.getElementById('over-best');
     const w = document.getElementById('over-worlds');
@@ -1242,6 +1268,24 @@ function showMap() {
   renderMap();
 }
 
+function showBadges() {
+  const start = document.getElementById('start-screen');
+  const levelup = document.getElementById('levelup');
+  const over = document.getElementById('gameover');
+  const shop = document.getElementById('shop');
+  const map = document.getElementById('map');
+  const pause = document.getElementById('pause');
+  const badges = document.getElementById('badges-page');
+  if (start) start.hidden = true;
+  if (levelup) levelup.hidden = true;
+  if (over) over.hidden = true;
+  if (shop) shop.hidden = true;
+  if (map) map.hidden = true;
+  if (pause) pause.hidden = true;
+  if (badges) badges.hidden = false;
+  renderBadges();
+}
+
 // At game over: bank best time + gold, unlock map worlds, award badges.
 function settleRun(state) {
   if (typeof localStorage === 'undefined') return;
@@ -1251,13 +1295,13 @@ function settleRun(state) {
   save.bestWorld = Math.max(save.bestWorld || 1, state.worldIndex + 1);
   const earn = (id) => { if (!save.badges.includes(id)) save.badges.push(id); };
   earn('hatchling');
-  if (state.level >= 5) earn('firestarter');
-  if (state.level >= 10) earn('dragonmaster');
-  if (state.worldIndex >= 1) earn('bosslayer');
-  if (state.worldIndex >= 2) earn('worldtraveler');
-  if (state.level >= 20) earn('legend');
-  if (state.level >= 30) earn('cosmic');
-  if (state.level >= 40) earn('immortal');
+  if (state.level >= 8) earn('firestarter');
+  if (state.level >= 16) earn('dragonmaster');
+  if (state.worldIndex >= 2) earn('bosslayer');
+  if (state.worldIndex >= 4) earn('worldtraveler');
+  if (state.level >= 28) earn('legend');
+  if (state.level >= 40) earn('cosmic');
+  if (state.level >= 55) earn('immortal');
   saveSave(save);
 }
 
@@ -1287,6 +1331,7 @@ function startRun() {
 }
 function resumeFromLevelUp(choice) {
   chooseUpgrade(state, choice);
+  if (choice && choice.kind === 'power' && POWERS[choice.id].rare) sfx('rare');
   if (state.pendingLevels > 0) {
     state.pendingLevels -= 1;
     const offered = offerUpgrades(state);
@@ -1298,11 +1343,15 @@ function resumeFromLevelUp(choice) {
   }
 }
 
-function quitRun() {
+function openPause() {
+  if (!state || state.status !== 'playing') return;
+  state.status = 'pause';
+}
+function confirmQuit() {
   if (!state) return;
-  if (state.status !== 'playing' && state.status !== 'levelup') return;
+  state.quit = true;
   settleRun(state);
-  state.status = 'start';
+  state.status = 'over';
 }
 
 function init() {
@@ -1336,7 +1385,11 @@ function init() {
   const muteBtn = document.getElementById('mute');
   if (muteBtn) muteBtn.addEventListener('click', () => setMute(!muted));
   const quitBtn = document.getElementById('quit');
-  if (quitBtn) quitBtn.addEventListener('click', quitRun);
+  if (quitBtn) quitBtn.addEventListener('click', openPause);
+  const continueBtn = document.getElementById('continue-btn');
+  if (continueBtn) continueBtn.addEventListener('click', () => { state.status = 'playing'; });
+  const quitConfirmBtn = document.getElementById('quit-confirm-btn');
+  if (quitConfirmBtn) quitConfirmBtn.addEventListener('click', confirmQuit);
 
   const shopBtn = document.getElementById('shop-btn');
   if (shopBtn) shopBtn.addEventListener('click', showShop);
@@ -1349,6 +1402,11 @@ function init() {
   if (mapBtn) mapBtn.addEventListener('click', showMap);
   const mapBackBtn = document.getElementById('map-back');
   if (mapBackBtn) mapBackBtn.addEventListener('click', () => showOverlays(state, handlers));
+
+  const badgeBtn = document.getElementById('badge-btn');
+  if (badgeBtn) badgeBtn.addEventListener('click', showBadges);
+  const badgesBackBtn = document.getElementById('badges-back');
+  if (badgesBackBtn) badgesBackBtn.addEventListener('click', () => showOverlays(state, handlers));
 
   const bestEl = document.getElementById('start-best');
   if (bestEl) bestEl.textContent = formatTime(loadBest());

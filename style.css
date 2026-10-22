@@ -51,6 +51,7 @@ body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
 .big-btn:hover{ filter:brightness(1.05) }
 .big-btn:active{ transform:translateY(3px); box-shadow:0 3px 0 #7c3fd6 }
 .big-btn.ghost{ background:var(--panel); color:var(--ink); border:2px solid #e4dbf8; box-shadow:0 6px 0 #d8cdf2 }
+.play-btn{ font-size:30px; padding:18px 54px }
 
 /* ===== Power cards ===== */
 .cards{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center }

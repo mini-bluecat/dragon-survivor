@@ -34,12 +34,12 @@
       <div class="overlay" id="start-screen">
         <h1>🐉 Dragon Swarm</h1>
         <p class="tagline">Move with arrows / WASD. Your dragon breathes fire by itself. Survive, beat bosses, explore worlds!</p>
-        <div class="badges" id="badges"></div>
+        <button class="big-btn play-btn" id="start-btn">▶ PLAY</button>
         <p class="gold">🪙 Gold saved: <span id="start-gold">0</span></p>
         <div class="btn-row">
-          <button class="big-btn" id="start-btn">▶ PLAY</button>
           <button class="big-btn ghost" id="shop-btn">🛒 SHOP</button>
           <button class="big-btn ghost" id="map-btn">🗺️ MAP</button>
+          <button class="big-btn ghost" id="badge-btn">🏅 BADGES</button>
         </div>
         <p class="best">Best run: <span id="start-best">0:00</span></p>
       </div>
@@ -50,7 +50,7 @@
       </div>
 
       <div class="overlay" id="gameover" hidden>
-        <h2>Out of hearts!</h2>
+        <h2 id="over-heading">Out of hearts!</h2>
         <p class="survived">You survived <span id="over-time">0:00</span></p>
         <p class="survived">Worlds explored: <span id="over-worlds">1</span></p>
         <p class="gold">🪙 Gold earned this run: +<span id="earned-gold">0</span></p>
@@ -72,6 +72,20 @@
         <h2>🗺️ World Map</h2>
         <div class="map-grid" id="map-grid"></div>
         <button class="big-btn ghost" id="map-back">⬅ Back</button>
+      </div>
+
+      <div class="overlay" id="pause" hidden>
+        <h2>⏸ Paused</h2>
+        <div class="btn-row">
+          <button class="big-btn" id="continue-btn">▶ Continue</button>
+          <button class="big-btn ghost" id="quit-confirm-btn">✖ Quit</button>
+        </div>
+      </div>
+
+      <div class="overlay" id="badges-page" hidden>
+        <h2>🏅 Badges</h2>
+        <div class="badges" id="badges"></div>
+        <button class="big-btn ghost" id="badges-back">⬅ Back</button>
       </div>
     </section>
 
