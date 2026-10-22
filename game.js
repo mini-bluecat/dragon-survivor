@@ -510,11 +510,11 @@ function spawnBoss(state) {
   const world = currentWorld(state);
   const def = BOSSES[world.boss];
   const rs = roundScale(state);
-  const hp = Math.round(def.hp * (1 + rs * 0.18));
+  const hp = Math.round(def.hp * (1 + rs * 0.18) * 1.25);
   state.boss = {
     id: def.id, name: def.name, emoji: def.emoji,
     x: ARENA.w / 2, y: -40, hp, maxHp: hp,
-    speed: def.speed, radius: def.radius, age: 0, orbitHit: 0,
+    speed: def.speed * 1.1, radius: def.radius, age: 0, orbitHit: 0,
   };
   spawnFloater(state, ARENA.w / 2, 70, def.name + '!', 'boss');
   state._boss = true;
