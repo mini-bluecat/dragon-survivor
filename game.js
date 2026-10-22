@@ -143,14 +143,14 @@ const SHOP = {
 
 // Badges — earn them by playing, then tap one to wear it. Shows in the HUD.
 const BADGES = [
-  { id: 'hatchling',     emoji: '🐣', name: 'Hatchling',      hint: 'Play your first run',  effect: 'Starter badge — no bonus',      bonus: {} },
-  { id: 'firestarter',   emoji: '🔥', name: 'Fire Starter',   hint: 'Reach level 8',        effect: '+2 damage',                     bonus: { damage: 2 } },
-  { id: 'dragonmaster',  emoji: '🐉', name: 'Dragon Master',  hint: 'Reach level 16',       effect: '+0.4 fire speed',               bonus: { fireRate: 0.4 } },
-  { id: 'bosslayer',     emoji: '👑', name: 'Boss Slayer',    hint: 'Beat 2 bosses',        effect: '+20 move speed',                bonus: { moveSpeed: 20 } },
-  { id: 'worldtraveler', emoji: '🌍', name: 'World Traveler', hint: 'Reach world 5',        effect: '+30 pickup range',              bonus: { magnet: 30 } },
-  { id: 'legend',        emoji: '🏆', name: 'Legend',         hint: 'Reach level 28',       effect: '+4 damage',                     bonus: { damage: 4 } },
-  { id: 'cosmic',        emoji: '🌌', name: 'Cosmic Dragon',  hint: 'Reach level 40',       effect: '+1 fireball',                   bonus: { projectiles: 1 } },
-  { id: 'immortal',      emoji: '💎', name: 'Immortal',       hint: 'Reach level 55',       effect: '+3 damage & +0.3 fire speed',   bonus: { damage: 3, fireRate: 0.3 } },
+  { id: 'hatchling',     emoji: '🐣', name: 'Hatchling',      hint: 'Play your first run',  effect: 'Starter badge — no bonus',      bonus: {}, gift: 0 },
+  { id: 'firestarter',   emoji: '🔥', name: 'Fire Starter',   hint: 'Reach level 8',        effect: '+2 damage',                     bonus: { damage: 2 }, gift: 30 },
+  { id: 'dragonmaster',  emoji: '🐉', name: 'Dragon Master',  hint: 'Reach level 16',       effect: '+0.4 fire speed',               bonus: { fireRate: 0.4 }, gift: 50 },
+  { id: 'bosslayer',     emoji: '👑', name: 'Boss Slayer',    hint: 'Beat 2 bosses',        effect: '+20 move speed',                bonus: { moveSpeed: 20 }, gift: 40 },
+  { id: 'worldtraveler', emoji: '🌍', name: 'World Traveler', hint: 'Reach world 5',        effect: '+30 pickup range',              bonus: { magnet: 30 }, gift: 60 },
+  { id: 'legend',        emoji: '🏆', name: 'Legend',         hint: 'Reach level 28',       effect: '+4 damage',                     bonus: { damage: 4 }, gift: 80 },
+  { id: 'cosmic',        emoji: '🌌', name: 'Cosmic Dragon',  hint: 'Reach level 40',       effect: '+1 fireball',                   bonus: { projectiles: 1 }, gift: 100 },
+  { id: 'immortal',      emoji: '💎', name: 'Immortal',       hint: 'Reach level 55',       effect: '+3 damage & +0.3 fire speed',   bonus: { damage: 3, fireRate: 0.3 }, gift: 120 },
 ];
 
 // Skins — change your dragon's look. Buy one with gold, then wear it.
@@ -1238,6 +1238,16 @@ function showOverlays(state, handlers) {
     if (b) b.textContent = formatTime(state.best || loadBest());
     if (w) w.textContent = String(state.worldIndex + 1);
     if (g) g.textContent = String(state.earnedGold || 0);
+    const bg = document.getElementById('badge-gift');
+    if (bg) {
+      if (state.badgeGift > 0) {
+        bg.hidden = false;
+        const nameEl = document.getElementById('badge-gift-name');
+        const goldEl = document.getElementById('badge-gift-gold');
+        if (nameEl) nameEl.textContent = (state.newBadges || []).join(', ');
+        if (goldEl) goldEl.textContent = String(state.badgeGift);
+      } else bg.hidden = true;
+    }
   }
 }
 
@@ -1294,7 +1304,14 @@ function settleRun(state) {
   state.earnedGold = state.runGold;
   save.gold += state.runGold;
   save.bestWorld = Math.max(save.bestWorld || 1, state.worldIndex + 1);
-  const earn = (id) => { if (!save.badges.includes(id)) save.badges.push(id); };
+  let badgeGift = 0;
+  const newBadges = [];
+  const earn = (id) => {
+    if (save.badges.includes(id)) return;
+    save.badges.push(id);
+    const b = BADGES.find((x) => x.id === id);
+    if (b && b.gift) { badgeGift += b.gift; newBadges.push(b.emoji + ' ' + b.name); }
+  };
   earn('hatchling');
   if (state.level >= 8) earn('firestarter');
   if (state.level >= 16) earn('dragonmaster');
@@ -1303,6 +1320,9 @@ function settleRun(state) {
   if (state.level >= 28) earn('legend');
   if (state.level >= 40) earn('cosmic');
   if (state.level >= 55) earn('immortal');
+  save.gold += badgeGift;
+  state.badgeGift = badgeGift;
+  state.newBadges = newBadges;
   saveSave(save);
 }
 
