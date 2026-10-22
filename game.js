@@ -17,7 +17,7 @@ const PLAYER_BASE = {
 const GEM_XP = 1;                  // base XP each star gives
 const TOUCH_DAMAGE = 1;            // hearts lost when a monster touches you
 const HIT_COOLDOWN = 0.4;          // seconds of i-frames after a touch (shorter = harder)
-const HEART_CHANCE = 0.03;         // base 3 in 100 monsters drop a heart
+const HEART_CHANCE = 0.04;         // base 4 in 100 monsters drop a heart
 
 const PROJECTILE_SPEED = 380;      // px/sec
 const PROJECTILE_RADIUS = 6;
@@ -1039,7 +1039,7 @@ function updateHud(state) {
     el.textContent = s;
   });
   set('hud-badge', (el) => { el.textContent = badgeEmoji(save.badge); });
-  set('hud-gold', (el) => { el.textContent = '🪙 ' + state.runGold; });
+  set('hud-gold', (el) => { el.textContent = '🪙 ' + (save.gold + state.runGold); });
   set('timer', (el) => { el.textContent = formatTime(state.time); });
   set('level', (el) => { el.textContent = 'Lv ' + state.level; });
   set('xp-fill', (el) => { el.style.width = clamp(state.xp / state.xpToNext * 100, 0, 100) + '%'; });
