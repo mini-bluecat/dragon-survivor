@@ -16,8 +16,8 @@ const PLAYER_BASE = {
 
 const GEM_XP = 1;                  // base XP each star gives
 const TOUCH_DAMAGE = 1;            // hearts lost when a monster touches you
-const HIT_COOLDOWN = 0.65;         // seconds of i-frames after a touch (shorter = harder)
-const HEART_CHANCE = 0.04;         // base 4 in 100 monsters drop a heart
+const HIT_COOLDOWN = 0.45;         // seconds of i-frames after a touch (shorter = harder)
+const HEART_CHANCE = 0.03;         // base 3 in 100 monsters drop a heart
 
 const PROJECTILE_SPEED = 380;      // px/sec
 const PROJECTILE_RADIUS = 6;
@@ -32,9 +32,9 @@ const NOVA_EVERY = 6;              // seconds between screen-clearing pulses
 const SHAKE_ON_HIT = 0.25;         // seconds of screen shake on a player hit
 const POP_TIME = 0.18;             // hero squash/stretch duration
 
-const SPAWN_BASE = 1.3;            // seconds between spawns at t=0
-const SPAWN_MIN = 0.28;            // fastest the swarm can spawn
-const SPAWN_RAMP = 0.014;          // spawn interval shed per second survived
+const SPAWN_BASE = 0.9;            // seconds between spawns at t=0
+const SPAWN_MIN = 0.16;            // fastest the swarm can spawn
+const SPAWN_RAMP = 0.022;          // spawn interval shed per second survived
 
 const BOSS_STEP = 5;               // a boss appears every 5 levels
 const GOLD_EVERY = 40;             // a gold-coin pile drops every 40 kills
@@ -54,7 +54,7 @@ const POWERS = {
               apply: (s) => { s.player.magnet += 46; } },
   armor:    { id: 'armor',    name: 'Dragon Armor',   emoji: '🛡️', world: 0, maxLevel: 3,
               flavor: 'A shield blocks a hit. Recharges faster each level.',
-              apply: (s) => { const cds = [9, 7, 4]; s.player.shieldCd = cds[(s.powers.armor || 1) - 1]; s.player.shieldReady = true; s.player.shieldTimer = 0; } },
+              apply: (s) => { const cds = [14, 11, 8]; s.player.shieldCd = cds[(s.powers.armor || 1) - 1]; s.player.shieldReady = true; s.player.shieldTimer = 0; } },
   might:    { id: 'might',    name: 'Mighty Fire',    emoji: '💥', world: 0, maxLevel: 3,
               flavor: 'Fire hits harder each level.',
               apply: (s) => { s.player.damage += 4; } },
@@ -87,7 +87,7 @@ const POWERS = {
               apply: (s) => { s.player.moveSpeed += 30; s.player.fireRate += 0.35; } },
   bubble:   { id: 'bubble',   name: 'Bubble Shield',  emoji: '🫧', world: 5, maxLevel: 3,
               flavor: 'A shield + slow healing.',
-              apply: (s) => { s.player.regen += 1; if (s.player.shieldCd === 0) { s.player.shieldCd = 5; s.player.shieldReady = true; } } },
+              apply: (s) => { s.player.regen += 1; if (s.player.shieldCd === 0) { s.player.shieldCd = 7; s.player.shieldReady = true; } } },
   vine:     { id: 'vine',     name: 'Vine Grab',      emoji: '🌿', world: 6, maxLevel: 3,
               flavor: 'Slow the swarm + heal a little.',
               apply: (s) => { s.player.slow += 0.1; s.player.regen += 1; } },
@@ -117,7 +117,7 @@ const FUSIONS = {
   iceshield: { id: 'iceshield', name: 'Ice Shield Dragon', emoji: '🧊',
                requires: ['armor', 'frost'],
                flavor: 'SUPER! Fast shield + the swarm nearly freezes.',
-               apply: (s) => { s.player.slow += 0.3; s.player.shieldCd = 2; s.player.shieldReady = true; } },
+               apply: (s) => { s.player.slow += 0.3; s.player.shieldCd = 3; s.player.shieldReady = true; } },
   goldrush:  { id: 'goldrush',  name: 'Gold Rush Dragon',  emoji: '💰',
                requires: ['magnet', 'wings'],
                flavor: 'SUPER! Zoom fast and suck in every coin.',
@@ -137,18 +137,20 @@ const SHOP = {
   gold:   { id: 'gold',   name: 'Gold Finder',  emoji: '💰', desc: '+20% more gold from drops',  cost: [50, 110, 200], max: 3 },
   magnet: { id: 'magnet', name: 'Magnet Boost', emoji: '🧲', desc: '+20 pickup range',            cost: [30, 60, 100, 150, 220], max: 5 },
   shield: { id: 'shield', name: 'Starting Shield', emoji: '🛡️', desc: 'Start each run with a shield', cost: [60, 130, 220], max: 3 },
+  star:   { id: 'star',   name: 'Star Boost',    emoji: '⭐', desc: '+1 XP per star',              cost: [35, 75, 130], max: 3 },
+  shot:   { id: 'shot',   name: 'Triple Shot',   emoji: '🐉', desc: '+1 starting fireball',        cost: [70, 150, 250], max: 3 },
 };
 
 // Badges — earn them by playing, then tap one to wear it. Shows in the HUD.
 const BADGES = [
-  { id: 'hatchling',     emoji: '🐣', name: 'Hatchling',     hint: 'Play your first run' },
-  { id: 'firestarter',   emoji: '🔥', name: 'Fire Starter',  hint: 'Reach level 5' },
-  { id: 'dragonmaster',  emoji: '🐉', name: 'Dragon Master', hint: 'Reach level 10' },
-  { id: 'bosslayer',     emoji: '👑', name: 'Boss Slayer',   hint: 'Beat a boss' },
-  { id: 'worldtraveler', emoji: '🌍', name: 'World Traveler', hint: 'Reach world 3' },
-  { id: 'legend',        emoji: '🏆', name: 'Legend',        hint: 'Reach level 20' },
-  { id: 'cosmic',        emoji: '🌌', name: 'Cosmic Dragon', hint: 'Reach level 30' },
-  { id: 'immortal',      emoji: '👑', name: 'Immortal',      hint: 'Reach level 40' },
+  { id: 'hatchling',     emoji: '🐣', name: 'Hatchling',      hint: 'Play your first run',  effect: 'Starter badge — no bonus',      bonus: {} },
+  { id: 'firestarter',   emoji: '🔥', name: 'Fire Starter',   hint: 'Reach level 5',        effect: '+2 damage',                     bonus: { damage: 2 } },
+  { id: 'dragonmaster',  emoji: '🐉', name: 'Dragon Master',  hint: 'Reach level 10',       effect: '+0.4 fire speed',               bonus: { fireRate: 0.4 } },
+  { id: 'bosslayer',     emoji: '👑', name: 'Boss Slayer',    hint: 'Beat a boss',          effect: '+20 move speed',                bonus: { moveSpeed: 20 } },
+  { id: 'worldtraveler', emoji: '🌍', name: 'World Traveler', hint: 'Reach world 3',        effect: '+30 pickup range',              bonus: { magnet: 30 } },
+  { id: 'legend',        emoji: '🏆', name: 'Legend',         hint: 'Reach level 20',       effect: '+4 damage',                     bonus: { damage: 4 } },
+  { id: 'cosmic',        emoji: '🌌', name: 'Cosmic Dragon',  hint: 'Reach level 30',       effect: '+1 fireball',                   bonus: { projectiles: 1 } },
+  { id: 'immortal',      emoji: '💎', name: 'Immortal',       hint: 'Reach level 40',       effect: '+3 damage & +0.3 fire speed',   bonus: { damage: 3, fireRate: 0.3 } },
 ];
 
 // Skins — change your dragon's look. Buy one with gold, then wear it.
@@ -369,7 +371,7 @@ function chooseUpgrade(state, choice) {
 }
 
 // ===== State factory (ONE game-state object) =====
-function freshGame(perks, skinEmoji) {
+function freshGame(perks, skinEmoji, badgeBonus) {
   const pk = perks || {};
   const lv = (id) => pk[id] || 0;
   const shieldLv = lv('shield');
@@ -379,12 +381,20 @@ function freshGame(perks, skinEmoji) {
     moveSpeed: PLAYER_BASE.moveSpeed + lv('speed') * 15,
     fireRate: PLAYER_BASE.fireRate + lv('breath') * 0.3,
     magnet: PLAYER_BASE.magnet + lv('magnet') * 20,
-    shieldCd: shieldLv > 0 ? [8, 6, 4][Math.min(shieldLv, 3) - 1] : 0,
+    projectiles: PLAYER_BASE.projectiles + lv('shot'),
+    starBonus: PLAYER_BASE.starBonus + lv('star'),
+    shieldCd: shieldLv > 0 ? [12, 9, 6][Math.min(shieldLv, 3) - 1] : 0,
     shieldReady: shieldLv > 0,
     shieldTimer: 0,
     emoji: skinEmoji || '🐉',
     hp: PLAYER_BASE.maxHp,
   });
+  const bb = badgeBonus || {};
+  if (bb.damage) player.damage += bb.damage;
+  if (bb.fireRate) player.fireRate += bb.fireRate;
+  if (bb.moveSpeed) player.moveSpeed += bb.moveSpeed;
+  if (bb.magnet) player.magnet += bb.magnet;
+  if (bb.projectiles) player.projectiles += bb.projectiles;
   return {
     status: 'start', time: 0,
     level: 1, xp: 0, xpToNext: xpForLevel(1),
@@ -413,6 +423,7 @@ function loadSave() {
     if (!Array.isArray(s.badges)) s.badges = ['hatchling'];
     if (!Array.isArray(s.skins) || s.skins.length === 0) s.skins = ['dragon'];
     if (!SKINS[s.skin]) s.skin = 'dragon';
+    if (!BADGES.find((b) => b.id === s.badge)) s.badge = 'hatchling';
     return s;
   } catch (e) { return defaultSave(); }
 }
@@ -443,8 +454,8 @@ function spawnEnemy(state, rng) {
   const pool = currentWorld(state).enemies;
   const def = ENEMIES[pool[Math.floor(r() * pool.length)]];
   const rs = roundScale(state);
-  const hpMul = 1 + rs * 0.12;    // monsters get stronger every round
-  const spdMul = 1 + rs * 0.02;
+  const hpMul = 1 + rs * 0.15;    // monsters get stronger every round
+  const spdMul = 1 + rs * 0.03;
   const edge = Math.floor(r() * 4);
   let x, y;
   if (edge === 0) { x = r() * ARENA.w; y = -20; }
@@ -454,7 +465,7 @@ function spawnEnemy(state, rng) {
   const hp = Math.round(def.hp * hpMul);
   state.enemies.push({
     id: def.id, emoji: def.emoji, behavior: def.behavior,
-    x, y, hp, maxHp: hp, speed: def.speed * spdMul,
+    x, y, hp, maxHp: hp, speed: def.speed * spdMul * 1.25,
     xp: GEM_XP, radius: 16, age: 0, orbitHit: 0,
   });
 }
@@ -615,7 +626,7 @@ function update(state, dt, input) {
   // --- spawn director (current world's pool; more monsters per tick each round) ---
   state.spawnTimer -= dt;
   if (state.spawnTimer <= 0 || state.enemies.length === 0) {
-    const count = Math.min(3, 1 + Math.floor(roundScale(state) / 4));
+    const count = Math.min(4, 1 + Math.floor(roundScale(state) / 3));
     for (let i = 0; i < count; i++) spawnEnemy(state);
     state.spawnTimer = spawnInterval(state.time);
   }
@@ -995,6 +1006,9 @@ function badgeEmoji(id) {
   const b = BADGES.find((x) => x.id === id);
   return b ? b.emoji : '🐣';
 }
+function equippedBadge() {
+  return BADGES.find((b) => b.id === save.badge) || BADGES[0];
+}
 function updateHud(state) {
   if (typeof document === 'undefined') return;
   const set = (id, fn) => { const el = document.getElementById(id); if (el) fn(el); };
@@ -1042,6 +1056,7 @@ function renderBadges() {
     btn.innerHTML =
       '<span class="badge-emoji">' + (owned ? b.emoji : '🔒') + '</span>' +
       '<span class="badge-name">' + (owned ? b.name : '???') + '</span>' +
+      '<span class="badge-effect">' + (owned ? b.effect : '') + '</span>' +
       '<span class="badge-hint">' + (owned ? b.hint : 'Keep playing!') + '</span>';
     if (owned) {
       btn.addEventListener('click', () => { save.badge = b.id; saveSave(save); renderBadges(); updateHud(state); sfx('buy'); });
@@ -1298,14 +1313,14 @@ function init() {
   const ctx = canvas.getContext('2d');
 
   save = loadSave();
-  state = freshGame(save.ups, (SKINS[save.skin] || SKINS.dragon).emoji);
+  state = freshGame(save.ups, (SKINS[save.skin] || SKINS.dragon).emoji, equippedBadge().bonus);
   muted = loadMute();
   setMute(muted);
 
   const handlers = {
     onChoose: resumeFromLevelUp,
     onStart: startRun,
-    onRestart: () => { state = freshGame(save.ups, (SKINS[save.skin] || SKINS.dragon).emoji); startRun(); },
+    onRestart: () => { state = freshGame(save.ups, (SKINS[save.skin] || SKINS.dragon).emoji, equippedBadge().bonus); startRun(); },
   };
 
   window.addEventListener('keydown', (e) => {
