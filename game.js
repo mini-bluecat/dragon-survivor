@@ -16,7 +16,7 @@ const PLAYER_BASE = {
 
 const GEM_XP = 1;                  // base XP each star gives
 const TOUCH_DAMAGE = 1;            // hearts lost when a monster touches you
-const HIT_COOLDOWN = 0.35;         // seconds of i-frames after a touch (shorter = harder)
+const HIT_COOLDOWN = 0.4;          // seconds of i-frames after a touch (shorter = harder)
 const HEART_CHANCE = 0.03;         // base 3 in 100 monsters drop a heart
 
 const PROJECTILE_SPEED = 380;      // px/sec
@@ -32,9 +32,9 @@ const NOVA_EVERY = 6;              // seconds between screen-clearing pulses
 const SHAKE_ON_HIT = 0.25;         // seconds of screen shake on a player hit
 const POP_TIME = 0.18;             // hero squash/stretch duration
 
-const SPAWN_BASE = 0.7;            // seconds between spawns at t=0
+const SPAWN_BASE = 0.8;            // seconds between spawns at t=0
 const SPAWN_MIN = 0.12;            // fastest the swarm can spawn
-const SPAWN_RAMP = 0.028;          // spawn interval shed per second survived
+const SPAWN_RAMP = 0.03;           // spawn interval shed per second survived
 
 const BOSS_STEP = 5;               // a boss appears every 5 levels
 const GOLD_EVERY = 40;             // a gold-coin pile drops every 40 kills
@@ -403,6 +403,7 @@ function freshGame(perks, skinEmoji, badgeBonus) {
     shieldReady: shieldLv > 0,
     shieldTimer: 0,
     emoji: skinEmoji || '🐉',
+    pop: 0, invuln: 0, aim: 0,
     hp: PLAYER_BASE.maxHp,
   });
   const bb = badgeBonus || {};
@@ -478,10 +479,10 @@ function spawnEnemy(state, rng) {
   else if (edge === 1) { x = ARENA.w + 20; y = r() * ARENA.h; }
   else if (edge === 2) { x = r() * ARENA.w; y = ARENA.h + 20; }
   else { x = -20; y = r() * ARENA.h; }
-  const hp = Math.round(def.hp * hpMul * 1.4);
+  const hp = Math.round(def.hp * hpMul * 1.3);
   state.enemies.push({
     id: def.id, emoji: def.emoji, behavior: def.behavior,
-    x, y, hp, maxHp: hp, speed: def.speed * spdMul * 1.25,
+    x, y, hp, maxHp: hp, speed: def.speed * spdMul * 1.3,
     xp: GEM_XP, radius: 16, age: 0, orbitHit: 0,
   });
 }
@@ -509,7 +510,7 @@ function spawnBoss(state) {
   const world = currentWorld(state);
   const def = BOSSES[world.boss];
   const rs = roundScale(state);
-  const hp = Math.round(def.hp * (1 + rs * 0.30));
+  const hp = Math.round(def.hp * (1 + rs * 0.25));
   state.boss = {
     id: def.id, name: def.name, emoji: def.emoji,
     x: ARENA.w / 2, y: -40, hp, maxHp: hp,
@@ -1393,8 +1394,8 @@ function init() {
 
   const shopBtn = document.getElementById('shop-btn');
   if (shopBtn) shopBtn.addEventListener('click', showShop);
-  const overShopBtn = document.getElementById('over-shop-btn');
-  if (overShopBtn) overShopBtn.addEventListener('click', showShop);
+  const menuBtn = document.getElementById('menu-btn');
+  if (menuBtn) menuBtn.addEventListener('click', () => { state.status = 'start'; });
   const shopBackBtn = document.getElementById('shop-back');
   if (shopBackBtn) shopBackBtn.addEventListener('click', () => showOverlays(state, handlers));
 
