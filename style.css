@@ -1,0 +1,121 @@
+:root{
+  /* Bright, cute, pastel — light blue / pink / purple. The canvas reads
+     --shot/--xp/--hp/--ink for fire, stars and hearts. Each world paints the
+     arena floor with its own colours from WORLDS in game.js. */
+  --bg:#eef2ff; --arena:#eaf3ff; --grid:#d7e6ff;
+  --hero:#ff6fb5; --shot:#ff9a3c; --xp:#ffb340; --hp:#ff5d8f;
+  --ink:#43306b; --muted:#8f82b5; --panel:#faf8ff; --accent:#a855f7;
+}
+*{ box-sizing:border-box }
+body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  background:var(--bg); color:var(--ink); }
+.app{ max-width:760px; margin:0 auto; padding:16px; display:flex; flex-direction:column; gap:10px }
+
+/* ===== HUD ===== */
+.hud{ display:flex; align-items:center; justify-content:space-between; gap:12px }
+.hud-left,.hud-right{ display:flex; align-items:center; gap:10px }
+.hearts{ font-size:20px; letter-spacing:2px; line-height:1 }
+.badge{ font-size:20px; line-height:1 }
+.level{ font-weight:700; font-size:14px; color:var(--accent); font-variant-numeric:tabular-nums }
+.hud-mid{ display:flex; flex-direction:column; align-items:center; gap:4px }
+.world{ font-size:13px; font-weight:700; color:var(--ink); background:var(--panel);
+  border:2px solid #e4dbf8; border-radius:12px; padding:4px 12px; white-space:nowrap }
+.timer{ font-size:24px; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:.04em }
+.gold-num{ font-size:18px; font-weight:800; color:#c58a00; font-variant-numeric:tabular-nums }
+.iconbtn{ background:var(--panel); border:2px solid #e4dbf8; color:var(--ink); border-radius:12px;
+  width:38px; height:34px; font-size:16px; cursor:pointer }
+.iconbtn:hover{ border-color:var(--accent) }
+
+/* ===== XP bar ===== */
+.xp{ height:8px; background:#e6e0f5; border-radius:6px; overflow:hidden }
+.xp-fill{ height:100%; width:0%; background:var(--xp); transition:width .15s }
+
+/* ===== Stage / canvas ===== */
+.stage{ position:relative; border-radius:18px; overflow:hidden; border:2px solid #e4dbf8;
+  line-height:0; box-shadow:0 12px 40px rgba(120,90,200,.18) }
+#arena{ display:block; width:100%; height:auto; background:var(--arena) }
+
+/* ===== Overlays ===== */
+.overlay{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:12px; text-align:center; line-height:1.3;
+  background:rgba(238,242,255,.94); backdrop-filter:blur(2px); padding:18px; overflow:auto }
+.overlay[hidden]{ display:none }
+.overlay h1{ margin:0; font-size:42px; font-weight:900; letter-spacing:.04em }
+.overlay h2{ margin:0; font-size:24px; font-weight:800; letter-spacing:.03em }
+.tagline{ margin:0; max-width:36ch; color:var(--muted) }
+.best,.survived{ margin:0; color:var(--muted); font-variant-numeric:tabular-nums }
+.gold{ margin:0; font-weight:700; color:#c58a00 }
+.btn-row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center }
+.big-btn{ background:var(--accent); color:#fff; border:none; border-radius:16px;
+  padding:14px 26px; font-size:20px; font-weight:800; cursor:pointer; box-shadow:0 6px 0 #7c3fd6 }
+.big-btn:hover{ filter:brightness(1.05) }
+.big-btn:active{ transform:translateY(3px); box-shadow:0 3px 0 #7c3fd6 }
+.big-btn.ghost{ background:var(--panel); color:var(--ink); border:2px solid #e4dbf8; box-shadow:0 6px 0 #d8cdf2 }
+
+/* ===== Power cards ===== */
+.cards{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center }
+.card{ width:176px; min-height:148px; background:var(--panel); border:2px solid #e4dbf8;
+  border-radius:16px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:5px;
+  cursor:pointer; text-align:center; color:var(--ink); box-shadow:0 4px 14px rgba(150,110,240,.14);
+  transition:transform .1s, border-color .1s }
+.card:hover{ transform:translateY(-4px) scale(1.03); border-color:var(--accent) }
+.card-emoji{ font-size:32px; line-height:1 }
+.card-name{ font-size:16px; font-weight:800; color:var(--ink) }
+.card-lv{ font-size:12px; font-weight:700; color:var(--accent) }
+.card-flavor{ font-size:11px; color:var(--muted) }
+.card.fusion{ border-color:#ffcf5c; background:#fff7e2 }
+.card.fusion .card-lv{ color:#d98a00 }
+.card.rare{ border-color:#ffb340; background:#fff3e0; box-shadow:0 4px 16px rgba(255,179,64,.35) }
+.card.rare .card-lv{ color:#d98a00 }
+
+/* ===== Badges ===== */
+.badges{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; width:100%; max-width:440px }
+.badge{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 4px;
+  background:var(--panel); border:2px solid #e4dbf8; border-radius:14px; cursor:pointer;
+  line-height:1.2; text-align:center }
+.badge-emoji{ font-size:24px }
+.badge-name{ font-size:11px; font-weight:800; color:var(--ink) }
+.badge-hint{ font-size:9px; color:var(--muted) }
+.badge.active{ border-color:var(--accent); background:#f3e9ff; box-shadow:0 0 0 2px var(--accent) }
+.badge.locked{ opacity:.45; cursor:default }
+
+/* ===== HUD badge chip + skills panel ===== */
+.badge-chip{ width:30px; height:30px; background:var(--panel); border:2px solid #e4dbf8;
+  border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; line-height:1 }
+.skills{ position:absolute; left:10px; bottom:10px; display:flex; flex-wrap:wrap; gap:6px; max-width:70%; pointer-events:none }
+.skill-chip{ display:flex; align-items:center; gap:3px; background:rgba(255,255,255,.88);
+  border:2px solid #e4dbf8; border-radius:12px; padding:3px 7px; font-size:15px; line-height:1 }
+.skill-chip.fusion{ border-color:#ffcf5c; background:#fff7e2 }
+.skill-lv{ font-size:11px; font-weight:800; color:var(--accent) }
+
+/* ===== Shop ===== */
+.shop{ display:flex; flex-direction:column; gap:8px; width:100%; max-width:420px }
+.shop-row{ display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--panel); border:2px solid #e4dbf8; border-radius:14px; padding:10px 12px; text-align:left }
+.shop-info{ display:flex; flex-direction:column; gap:2px }
+.shop-emoji{ font-size:22px }
+.shop-name{ font-size:15px; font-weight:800 }
+.shop-desc{ font-size:11px; color:var(--muted) }
+.buy-btn{ background:var(--xp); color:#5b3a00; border:none; border-radius:12px; padding:10px 14px;
+  font-size:14px; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 4px 0 #e09a20 }
+.buy-btn:hover:not(:disabled){ filter:brightness(1.05) }
+.buy-btn:disabled{ opacity:.45; cursor:default; box-shadow:none }
+
+/* ===== World map ===== */
+.map-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; width:100%; max-width:480px }
+.map-cell{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:12px;
+  background:var(--panel); border:2px solid #e4dbf8; border-radius:14px; text-align:center }
+.map-cell.locked{ opacity:.55 }
+.map-num{ font-size:11px; font-weight:800; color:var(--muted) }
+.map-emoji{ font-size:30px; line-height:1 }
+.map-name{ font-size:13px; font-weight:800 }
+.map-boss{ font-size:11px; color:var(--muted) }
+
+/* ===== Tips footer ===== */
+.tips{ text-align:center; color:var(--muted); font-size:13px }
+
+@media (max-width:520px){
+  .hearts{ font-size:16px } .overlay h1{ font-size:30px } .card{ width:150px }
+  .world{ font-size:11px; padding:3px 8px } .map-grid{ grid-template-columns:1fr 1fr }
+  .badges{ grid-template-columns:repeat(3,1fr) }
+}

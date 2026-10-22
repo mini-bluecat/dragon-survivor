@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dragon Swarm Survivor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="hud">
+      <div class="hud-left">
+        <span class="badge-chip" id="hud-badge">🐣</span>
+        <div class="hearts" id="hearts">❤️❤️❤️❤️❤️</div>
+        <span class="level" id="level">Lv 1</span>
+      </div>
+      <div class="hud-mid">
+        <span class="world" id="world">🏰 Castle World</span>
+        <span class="timer" id="timer">0:00</span>
+      </div>
+      <div class="hud-right">
+        <span class="gold-num" id="hud-gold">🪙 0</span>
+        <button id="mute" class="iconbtn" aria-pressed="false" aria-label="Toggle sound">🔊</button>
+        <button id="quit" class="iconbtn" aria-label="Quit run" hidden>✖</button>
+      </div>
+    </header>
+
+    <div class="xp"><div class="xp-fill" id="xp-fill"></div></div>
+
+    <section class="stage">
+      <canvas id="arena" width="720" height="480" aria-label="Dragon Swarm Survivor arena"></canvas>
+      <div class="skills" id="skills"></div>
+
+      <div class="overlay" id="start-screen">
+        <h1>🐉 Dragon Swarm</h1>
+        <p class="tagline">Move with arrows / WASD. Your dragon breathes fire by itself. Survive, beat bosses, explore worlds!</p>
+        <div class="badges" id="badges"></div>
+        <p class="gold">🪙 Gold saved: <span id="start-gold">0</span></p>
+        <div class="btn-row">
+          <button class="big-btn" id="start-btn">▶ PLAY</button>
+          <button class="big-btn ghost" id="shop-btn">🛒 SHOP</button>
+          <button class="big-btn ghost" id="map-btn">🗺️ MAP</button>
+        </div>
+        <p class="best">Best run: <span id="start-best">0:00</span></p>
+      </div>
+
+      <div class="overlay" id="levelup" hidden>
+        <h2>LEVEL UP — pick a power</h2>
+        <div class="cards" id="cards"></div>
+      </div>
+
+      <div class="overlay" id="gameover" hidden>
+        <h2>Out of hearts!</h2>
+        <p class="survived">You survived <span id="over-time">0:00</span></p>
+        <p class="survived">Worlds explored: <span id="over-worlds">1</span></p>
+        <p class="gold">🪙 Gold earned this run: +<span id="earned-gold">0</span></p>
+        <p class="best">Best run: <span id="over-best">0:00</span></p>
+        <div class="btn-row">
+          <button class="big-btn" id="restart-btn">↻ PLAY AGAIN</button>
+          <button class="big-btn ghost" id="over-shop-btn">🛒 SHOP</button>
+        </div>
+      </div>
+
+      <div class="overlay" id="shop" hidden>
+        <h2>🛒 Dragon Shop</h2>
+        <p class="gold">🪙 Gold: <span id="shop-gold">0</span></p>
+        <div class="shop" id="shop-list"></div>
+        <button class="big-btn ghost" id="shop-back">⬅ Back</button>
+      </div>
+
+      <div class="overlay" id="map" hidden>
+        <h2>🗺️ World Map</h2>
+        <div class="map-grid" id="map-grid"></div>
+        <button class="big-btn ghost" id="map-back">⬅ Back</button>
+      </div>
+    </section>
+
+    <footer class="tips">Move in big circles → fry the swarm → grab ⭐ stars, ❤️ hearts & 🪙 gold. Beat bosses for gold — and every 40 kills drops a pile too!</footer>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
