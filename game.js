@@ -16,7 +16,7 @@ const PLAYER_BASE = {
 
 const GEM_XP = 1;                  // base XP each star gives
 const TOUCH_DAMAGE = 1;            // hearts lost when a monster touches you
-const HIT_COOLDOWN = 0.4;          // seconds of i-frames after a touch (shorter = harder)
+const HIT_COOLDOWN = 0.6;          // seconds of i-frames after a touch (longer = easier)
 const HEART_CHANCE = 0.04;         // base 4 in 100 monsters drop a heart
 
 const PROJECTILE_SPEED = 380;      // px/sec
@@ -32,9 +32,9 @@ const NOVA_EVERY = 6;              // seconds between screen-clearing pulses
 const SHAKE_ON_HIT = 0.25;         // seconds of screen shake on a player hit
 const POP_TIME = 0.18;             // hero squash/stretch duration
 
-const SPAWN_BASE = 0.8;            // seconds between spawns at t=0
-const SPAWN_MIN = 0.12;            // fastest the swarm can spawn
-const SPAWN_RAMP = 0.03;           // spawn interval shed per second survived
+const SPAWN_BASE = 1.0;            // seconds between spawns at t=0
+const SPAWN_MIN = 0.25;            // fastest the swarm can spawn
+const SPAWN_RAMP = 0.018;          // spawn interval shed per second survived
 
 const BOSS_STEP = 5;               // a boss appears every 5 levels
 const GOLD_EVERY = 40;             // a gold-coin pile drops every 40 kills
@@ -268,7 +268,7 @@ function nearestEnemy(x, y, enemies) {
 
 // ===== Progression: XP → level =====
 function xpForLevel(level) {
-  return 5 + (level - 1) * 3;
+  return 8 + (level - 1) * 5;
 }
 function applyXp(state, amount) {
   state.xp += amount;
@@ -471,15 +471,15 @@ function spawnEnemy(state, rng) {
   const pool = currentWorld(state).enemies;
   const def = ENEMIES[pool[Math.floor(r() * pool.length)]];
   const rs = roundScale(state);
-  const hpMul = 1 + rs * 0.15;    // monsters get stronger every round
-  const spdMul = 1 + rs * 0.03;
+  const hpMul = 1 + rs * 0.10;    // monsters get a little stronger every round
+  const spdMul = 1 + rs * 0.02;
   const edge = Math.floor(r() * 4);
   let x, y;
   if (edge === 0) { x = r() * ARENA.w; y = -20; }
   else if (edge === 1) { x = ARENA.w + 20; y = r() * ARENA.h; }
   else if (edge === 2) { x = r() * ARENA.w; y = ARENA.h + 20; }
   else { x = -20; y = r() * ARENA.h; }
-  const hp = Math.round(def.hp * hpMul * 1.3);
+  const hp = Math.round(def.hp * hpMul);
   state.enemies.push({
     id: def.id, emoji: def.emoji, behavior: def.behavior,
     x, y, hp, maxHp: hp, speed: def.speed * spdMul,
@@ -510,7 +510,7 @@ function spawnBoss(state) {
   const world = currentWorld(state);
   const def = BOSSES[world.boss];
   const rs = roundScale(state);
-  const hp = Math.round(def.hp * (1 + rs * 0.25));
+  const hp = Math.round(def.hp * (1 + rs * 0.18));
   state.boss = {
     id: def.id, name: def.name, emoji: def.emoji,
     x: ARENA.w / 2, y: -40, hp, maxHp: hp,
